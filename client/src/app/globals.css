@@ -1,68 +1,47 @@
 @import "tailwindcss";
 
 @theme {
-  --font-heading: var(--font-heading);
-  --font-sans: var(--font-body);
+  --color-brand-black: #0a0a0a;
+  --color-brand-white: #ffffff;
+  --color-brand-indigo: #4b0082;
+  /* Deep Indigo logic */
+  --color-brand-gold: #c5a059;
+  /* Royal Gold accent */
 
-  --color-amber-50: #fffbeb;
-  --color-amber-100: #fef3c7;
-  --color-amber-200: #fde68a;
-  --color-amber-300: #fcd34d;
-  --color-amber-400: #fbbf24;
-  --color-amber-500: #f59e0b;
-  --color-amber-600: #d97706;
-  --color-amber-700: #b45309;
-  --color-amber-800: #92400e;
-  --color-amber-900: #78350f;
-  --color-amber-950: #451a03;
-
-  --color-stone-50: #fafaf9;
-  --color-stone-100: #f5f5f4;
-  --color-stone-200: #e7e5e4;
-  --color-stone-300: #d6d3d1;
-  --color-stone-400: #a8a29e;
-  --color-stone-500: #78716c;
-  --color-stone-600: #57534e;
-  --color-stone-700: #44403c;
-  --color-stone-800: #292524;
-  --color-stone-900: #1c1917;
-  --color-stone-950: #0c0a09;
+  --font-display: 'Playfair Display', serif;
+  /* For royal headings */
+  --font-body: 'Inter', sans-serif;
 }
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 10, 10, 10;
+  --background-rgb: 255, 255, 255;
+  --indigo-accent: #4b0082;
 }
 
-/* 
-  @layer base in v4 is usually handled by the import, 
-  but we can adds styles to the base layer like this:
-*/
 @layer base {
   body {
-    @apply bg-stone-50 text-stone-900;
+    @apply bg-white text-black font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif font-bold tracking-tight;
   }
 }
 
-.font-heading {
-  font-family: var(--font-heading);
+/* Custom Utilities for Adire Pattern effects */
+.bg-adire {
+  background-color: #f8fafc;
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+.text-stroke-sm {
+  -webkit-text-stroke: 1px black;
+  color: transparent;
 }

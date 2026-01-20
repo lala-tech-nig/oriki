@@ -1,97 +1,110 @@
 "use client";
-import { useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import { User, LogOut, Map, BookOpen, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { PlusCircle, Search, Clock, FileText } from 'lucide-react';
 
 export default function Dashboard() {
-    const { user, logout, loading } = useAuth();
-    const router = useRouter();
+    const [user, setUser] = useState(null);
+    const [requests, setRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!loading && !user) {
-            router.push('/login');
-        }
-    }, [user, loading, router]);
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/login';
+                    return;
+                }
 
-    if (loading || !user) {
-        return (
-            <div className="flex justify-center items-center h-screen bg-stone-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-800"></div>
-            </div>
-        );
-    }
+                // Fetch user requests
+                const reqRes = await fetch('http://localhost:5000/api/user/requests/my', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const reqData = await reqRes.json();
+                if (reqData.success) {
+                    setRequests(reqData.data);
+                }
+
+                // Mock user data or fetch from profile endpoint (skipped for brevity, assuming token works)
+                setUser({ name: 'Subscriber' });
+
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) return <div className="min-h-screen flex items-center justify-center">Loading Dashboard...</div>;
 
     return (
-        <div className="min-h-screen bg-stone-50 py-12 px-4">
-            <div className="max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+        <div className="min-h-screen bg-stone-50 py-12">
+            <div className="container mx-auto px-6">
+                <header className="mb-12 flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold font-heading text-stone-900">Welcome, {user.name}</h1>
-                        <p className="text-stone-500">Your personal heritage journey</p>
+                        <h1 className="text-3xl font-display font-bold text-gray-900">Welcome Back.</h1>
+                        <p className="text-gray-600">Explore the archives or contribute to the history.</p>
                     </div>
-                    <button
-                        onClick={logout}
-                        className="mt-4 md:mt-0 flex items-center text-red-600 hover:text-red-800 font-medium px-4 py-2 bg-red-50 rounded-lg transition-colors border border-red-100"
-                    >
-                        <LogOut size={18} className="mr-2" /> Sign Out
-                    </button>
+                    <Link href="/discover" className="btn-secondary flex items-center gap-2 text-indigo-900 font-bold hover:underline">
+                        <Search size={18} /> Browse Archive
+                    </Link>
+                </header>
+
+                {/* Action Cards */}
+                <div className="grid md:grid-cols-2 gap-8 mb-12">
+                    <Link href="/submit" className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-indigo-900 transition-all flex items-start gap-4">
+                        <div className="bg-indigo-50 p-3 rounded-full text-indigo-900 group-hover:bg-indigo-900 group-hover:text-white transition-colors">
+                            <FileText size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold mb-2">Submit a Story</h3>
+                            <p className="text-gray-600 mb-4">Know a history, oriki, or legend that isn't here? Submit it for verification and publication.</p>
+                            <span className="text-sm font-bold text-indigo-900 uppercase tracking-widest">Start Writing &rarr;</span>
+                        </div>
+                    </Link>
+
+                    <Link href="/request" className="group bg-green-50/50 p-8 rounded-xl shadow-sm border border-green-100 hover:border-green-600 transition-all flex items-start gap-4">
+                        <div className="bg-green-100 p-3 rounded-full text-green-800 group-hover:bg-green-800 group-hover:text-white transition-colors">
+                            <PlusCircle size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold mb-2">Request Research</h3>
+                            <p className="text-gray-600 mb-4">need deep research on a specific town, king, or lineage? Our team will dig into the archives for you.</p>
+                            <span className="text-sm font-bold text-green-800 uppercase tracking-widest">Make Request &rarr;</span>
+                        </div>
+                    </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Profile Card */}
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
-                        <div className="flex items-center mb-6">
-                            <User className="text-amber-600 mr-2" />
-                            <h2 className="text-xl font-bold text-stone-900">My Profile</h2>
-                        </div>
+                {/* My Requests Status */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                        <Clock className="text-gray-400" />
+                        <h2 className="text-xl font-bold">My Requests & Submissions</h2>
+                    </div>
+
+                    {requests.length > 0 ? (
                         <div className="space-y-4">
-                            <div>
-                                <p className="text-xs text-stone-400 uppercase">Email</p>
-                                <p className="font-medium text-stone-800">{user.email}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-stone-400 uppercase">Role</p>
-                                <p className="font-medium text-stone-800 capitalize">{user.role}</p>
-                            </div>
+                            {requests.map(req => (
+                                <div key={req._id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                    <div>
+                                        <h4 className="font-bold text-gray-900">{req.topic}</h4>
+                                        <p className="text-sm text-gray-500">{req.type}</p>
+                                    </div>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${req.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                            req.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                                'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                        {req.status.replace('_', ' ')}
+                                    </span>
+                                </div>
+                            ))}
                         </div>
-                        <button className="w-full mt-6 py-2 border border-stone-200 rounded-lg text-stone-600 hover:bg-stone-50 text-sm font-medium">
-                            Edit Profile
-                        </button>
-                    </div>
-
-                    {/* Recent Discoveries */}
-                    <div className="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center">
-                                <Clock className="text-amber-600 mr-2" />
-                                <h2 className="text-xl font-bold text-stone-900">Recent Discoveries</h2>
-                            </div>
-                            <button className="text-sm text-amber-700 font-semibold hover:underline">View All</button>
-                        </div>
-
-                        {/* Placeholder for saved discoveries */}
-                        <div className="bg-stone-50 rounded-xl p-8 text-center border border-dashed border-stone-200">
-                            <Map className="w-12 h-12 text-stone-300 mx-auto mb-4" />
-                            <p className="text-stone-500 mb-4">You haven't saved any heritage discoveries yet.</p>
-                            <button onClick={() => router.push('/identity-engine')} className="px-6 py-2 bg-stone-900 text-white rounded-full text-sm font-medium hover:bg-black transition-colors">
-                                Start Tracing Roots
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Family Tree Placeholder */}
-                    <div className="md:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
-                        <div className="flex items-center mb-6">
-                            <BookOpen className="text-amber-600 mr-2" />
-                            <h2 className="text-xl font-bold text-stone-900">Family Tree</h2>
-                        </div>
-                        <div className="bg-gradient-to-r from-stone-50 to-stone-100 rounded-xl p-12 text-center border border-stone-100">
-                            <p className="text-stone-500 mb-2">Build your ancestral tree to preserve your lineage for future generations.</p>
-                            <span className="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded font-medium">Coming Soon</span>
-                        </div>
-                    </div>
+                    ) : (
+                        <p className="text-gray-500 italic">You haven't made any requests yet.</p>
+                    )}
                 </div>
             </div>
         </div>

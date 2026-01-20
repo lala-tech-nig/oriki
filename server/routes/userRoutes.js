@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { updateProfile } = require('../controllers/userController');
+const { submitContent, makeRequest, getMyRequests } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
-router.put('/profile', protect, updateProfile);
+router.use(protect);
+
+router.post('/submit', submitContent);
+router.post('/request', makeRequest);
+router.get('/requests/my', getMyRequests);
 
 module.exports = router;

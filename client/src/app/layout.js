@@ -16,8 +16,8 @@ const bodyFont = Inter({
 });
 
 export const metadata = {
-  title: "Roots.ng | Discover Your Heritage",
-  description: "A heritage & ancestry discovery platform for Nigeria and the African diaspora.",
+  title: "Oriki.ng | The Yoruba Knowledge Zone",
+  description: "The one-stop platform for Yoruba history, culture, verified stories, and heritage. Access the largest digital archive of Yoruba knowledge.",
 };
 
 import { AuthProvider } from "@/context/AuthContext";

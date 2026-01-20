@@ -1,4 +1,6 @@
-[00:00:05.968] Server  LOG     ✓ Ready in 4.3s
-[00:01:22.826] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:23.276] Browser ERROR   Auth check failed {}
-[23:49:09.773] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:03.787] Server  LOG     ✓ Ready in 2.7s
+[00:01:22.992] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:26.135] Browser ERROR   Auth check failed {}
+[00:04:21.059] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:07:55.796] Server  LOG     ✓ Compiled in 758ms
+[00:08:00.640] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold

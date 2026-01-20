@@ -23,18 +23,23 @@ const UserSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'researcher', 'admin'],
+        enum: ['user', 'admin', 'superadmin'],
         default: 'user'
     },
-    heritageProfile: {
-        ethnicGroup: String,
-        town: String,
+    subscriptionStatus: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'inactive'
+    },
+    subscriptionExpiry: {
+        type: Date
+    },
+    profile: {
+        yorubaName: String,
+        originTown: String,
         state: String,
-        familyTree: { type: mongoose.Schema.Types.Mixed }, // Placeholder for JSON structure
-        savedDiscoveries: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Discovery'
-        }]
+        ethnicGroup: String, // e.g. Egba, Ijebu
+        fullOriki: String, // Text of their personal Oriki
     },
     createdAt: {
         type: Date,

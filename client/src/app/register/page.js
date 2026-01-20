@@ -1,95 +1,131 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
-import { UserPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-export default function RegisterPage() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+export default function Register() {
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
     const [error, setError] = useState('');
-    const { register } = useAuth();
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+
+    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
+        setLoading(true);
         setError('');
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            setLoading(false);
+            return;
+        }
+
         try {
-            await register(name, email, password);
+            const res = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                localStorage.setItem('token', data.token);
+                window.location.href = '/dashboard';
+            } else {
+                setError(data.error || 'Registration failed');
+            }
         } catch (err) {
-            setError(err.message || 'Registration failed');
+            setError('Connection failed');
         } finally {
-            setIsSubmitting(false);
+            setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-stone-50 px-4">
-            <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl border border-stone-100">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold font-heading text-stone-900">Join Roots.ng</h1>
-                    <p className="text-stone-500">Begin tracing your lineage today</p>
+        <div className="min-h-screen grid md:grid-cols-2 bg-white">
+            {/* Left Side - Visual */}
+            <div className="hidden md:flex bg-indigo-900 items-center justify-center p-12 text-white relative overflow-hidden">
+                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/black-scales.png')]"></div>
+                <div className="relative z-10 max-w-md">
+                    <h1 className="text-5xl font-display font-bold mb-6">Discover Your Roots.</h1>
+                    <p className="text-indigo-200 text-lg">Join the community of history keepers. Preserve your heritage today.</p>
                 </div>
+            </div>
 
-                {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm text-center">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-stone-700 mb-2">Full Name</label>
-                        <input
-                            type="text"
-                            required
-                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
+            {/* Right Side - Form */}
+            <div className="flex items-center justify-center p-8">
+                <div className="max-w-md w-full space-y-8">
+                    <div className="text-center md:text-left">
+                        <h2 className="text-3xl font-display font-bold text-gray-900">Create Account</h2>
+                        <p className="mt-2 text-gray-600">Start your journey with Oriki.ng.</p>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-stone-700 mb-2">Email Address</label>
-                        <input
-                            type="email"
-                            required
-                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+                        {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded">{error}</div>}
 
-                    <div>
-                        <label className="block text-sm font-medium text-stone-700 mb-2">Password</label>
-                        <input
-                            type="password"
-                            required
-                            minLength={6}
-                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                                className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-none shadow-sm focus:ring-indigo-900 focus:border-indigo-900 sm:text-sm"
+                            />
+                        </div>
 
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full bg-amber-600 text-white py-3 rounded-xl font-semibold hover:bg-amber-700 transition-colors flex justify-center items-center shadow-lg shadow-amber-900/20"
-                    >
-                        {isSubmitting ? 'Creating Account...' : (
-                            <>Create Account <UserPlus size={18} className="ml-2" /></>
-                        )}
-                    </button>
-                </form>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-none shadow-sm focus:ring-indigo-900 focus:border-indigo-900 sm:text-sm"
+                            />
+                        </div>
 
-                <div className="mt-6 text-center text-sm text-stone-500">
-                    Already have an account?{' '}
-                    <Link href="/login" className="text-stone-900 font-semibold hover:underline">
-                        Sign in
-                    </Link>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Password</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-none shadow-sm focus:ring-indigo-900 focus:border-indigo-900 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                    className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-none shadow-sm focus:ring-indigo-900 focus:border-indigo-900 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold uppercase tracking-widest text-white bg-black hover:bg-gray-800 transition"
+                        >
+                            {loading ? 'Creating Account...' : 'Register'}
+                        </button>
+                    </form>
+
+                    <p className="text-center text-sm text-gray-600">
+                        Already have an account? <Link href="/login" className="font-bold text-indigo-900 hover:text-indigo-800">Sign in</Link>
+                    </p>
                 </div>
             </div>
         </div>
