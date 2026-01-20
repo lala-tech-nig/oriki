@@ -17,6 +17,7 @@ server/node_modules
 
 # next.js
 /.next/
+client/.next/
 /out/
 
 # production
